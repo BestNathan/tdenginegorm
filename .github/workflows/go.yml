@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: tdengine/tdengine:latest
+      image: tdengine/tdengine:3.3.1.0
       options: --user root
       volumes:
         - /etc/apt/sources.list:/etc/apt/sources.list
