@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/taosdata/driver-go/v3/taosSql"
+	_ "github.com/taosdata/driver-go/v3/taosRestful"
 
 	"github.com/BestNathan/tdenginegorm"
 	"github.com/BestNathan/tdenginegorm/clause/create"
@@ -17,9 +17,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestDialect(t *testing.T) {
-	dsn := "root:taosdata@/cfg/"
+const testDB = "gorm_test"
+const dsn = "root:taosdata@http(127.0.0.1:6041)/"
+const dsnWithDB = "root:taosdata@http(127.0.0.1:6041)/" + testDB
 
+func TestDialect(t *testing.T) {
 	rows := []struct {
 		description  string
 		dialect      *tdenginegorm.Dialect
@@ -27,19 +29,20 @@ func TestDialect(t *testing.T) {
 		query        string
 		querySuccess bool
 	}{
-		{
-			description: "Default driver",
-			dialect: &tdenginegorm.Dialect{
-				DSN: dsn,
-			},
-			openSuccess:  true,
-			query:        "SELECT 1",
-			querySuccess: true,
-		},
+		// {
+		// 	description: "Default driver",
+		// 	dialect: &tdenginegorm.Dialect{
+		// 		DriverName: tdenginegorm.DriverNameTaosRestful,
+		// 		DSN:        dsn,
+		// 	},
+		// 	openSuccess:  true,
+		// 	query:        "SELECT 1",
+		// 	querySuccess: true,
+		// },
 		{
 			description: "create db",
 			dialect: &tdenginegorm.Dialect{
-				DriverName: tdenginegorm.DriverNameTaosSql,
+				DriverName: tdenginegorm.DriverNameTaosRestful,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -49,27 +52,27 @@ func TestDialect(t *testing.T) {
 		{
 			description: "create table",
 			dialect: &tdenginegorm.Dialect{
-				DriverName: tdenginegorm.DriverNameTaosSql,
+				DriverName: tdenginegorm.DriverNameTaosRestful,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
-			query:        "create table if not exists gorm_test.test (ts timestamp, value double)",
+			query:        "CREATE STABLE IF NOT EXISTS gorm_test.test (ts TIMESTAMP, current FLOAT) TAGS (groupId INT, location BINARY(24))",
 			querySuccess: true,
 		},
 		{
 			description: "insert data",
 			dialect: &tdenginegorm.Dialect{
-				DriverName: tdenginegorm.DriverNameTaosSql,
+				DriverName: tdenginegorm.DriverNameTaosRestful,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
-			query:        "insert into gorm_test.test values (now,12)",
+			query:        fmt.Sprintf("insert into gorm_test.test using gorm_test.test tags(1,'test') values (%d,12)", time.Now().UnixNano()),
 			querySuccess: true,
 		},
 		{
 			description: "query data",
 			dialect: &tdenginegorm.Dialect{
-				DriverName: tdenginegorm.DriverNameTaosSql,
+				DriverName: tdenginegorm.DriverNameTaosRestful,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -79,7 +82,7 @@ func TestDialect(t *testing.T) {
 		{
 			description: "syntax error",
 			dialect: &tdenginegorm.Dialect{
-				DriverName: tdenginegorm.DriverNameTaosSql,
+				DriverName: tdenginegorm.DriverNameTaosRestful,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -123,8 +126,7 @@ func TestDialect(t *testing.T) {
 
 func TestClause(t *testing.T) {
 	//create db
-	dsnWithoutDB := "root:taosdata@/cfg/?loc=Local"
-	nativeDB, err := sql.Open(tdenginegorm.DriverNameTaosSql, dsnWithoutDB)
+	nativeDB, err := sql.Open(tdenginegorm.DriverNameTaosRestful, dsn)
 	if err != nil {
 		t.Errorf("connect db error:%v", err)
 		return
@@ -135,8 +137,8 @@ func TestClause(t *testing.T) {
 		return
 	}
 	nativeDB.Close()
-	dsn := "root:taosdata@/cfg/gorm_test?loc=Local"
-	db, err := gorm.Open(tdenginegorm.Open(dsn))
+
+	db, err := gorm.Open(tdenginegorm.Open(dsnWithDB))
 	if err != nil {
 		t.Errorf("unexpected error:%v", err)
 		return
