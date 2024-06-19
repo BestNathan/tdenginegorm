@@ -1,10 +1,11 @@
-package tdengine_gorm
+package tdenginegorm
 
 import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/taosdata/driver-go/v2/taosSql"
+
+	_ "github.com/taosdata/driver-go/v3/taosRestful"
 	"gorm.io/gorm"
 	"gorm.io/gorm/callbacks"
 	"gorm.io/gorm/clause"
@@ -14,7 +15,7 @@ import (
 )
 
 // DriverName is the default driver name for TDengine.
-const DriverName = "taosSql"
+const DriverName = "taosRestful"
 
 type Dialect struct {
 	DriverName string

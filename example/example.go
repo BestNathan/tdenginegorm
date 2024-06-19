@@ -2,16 +2,17 @@ package main
 
 import (
 	"database/sql"
-	"github.com/taosdata/tdengine_gorm"
-	"github.com/taosdata/tdengine_gorm/clause/create"
-	"github.com/taosdata/tdengine_gorm/clause/fill"
-	"github.com/taosdata/tdengine_gorm/clause/using"
-	"github.com/taosdata/tdengine_gorm/clause/window"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"log"
 	"math/rand"
 	"time"
+
+	"github.com/BestNathan/tdenginegorm"
+	"github.com/BestNathan/tdenginegorm/clause/create"
+	"github.com/BestNathan/tdenginegorm/clause/fill"
+	"github.com/BestNathan/tdenginegorm/clause/using"
+	"github.com/BestNathan/tdenginegorm/clause/window"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Data struct {
@@ -121,7 +122,7 @@ func main() {
 
 func createDatabase() {
 	dsnWithoutDB := "root:taosdata@/tcp(127.0.0.1:6030)/?loc=Local"
-	nativeDB, err := sql.Open(tdengine_gorm.DriverName, dsnWithoutDB)
+	nativeDB, err := sql.Open(tdenginegorm.DriverName, dsnWithoutDB)
 	if err != nil {
 		log.Fatalf("connect db error:%v", err)
 		return
@@ -136,7 +137,7 @@ func createDatabase() {
 
 func connect() *gorm.DB {
 	dsn := "root:taosdata@/tcp(127.0.0.1:6030)/gorm_test?loc=Local"
-	db, err := gorm.Open(tdengine_gorm.Open(dsn))
+	db, err := gorm.Open(tdenginegorm.Open(dsn))
 	if err != nil {
 		log.Fatalf("unexpected error:%v", err)
 	}

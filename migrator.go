@@ -1,4 +1,4 @@
-package tdengine_gorm
+package tdenginegorm
 
 import (
 	"database/sql"

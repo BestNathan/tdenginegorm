@@ -1,12 +1,12 @@
-package tdengine_gorm
+package tdenginegorm
 
 import (
 	"database/sql"
 	"fmt"
-	"github.com/taosdata/tdengine_gorm/clause/create"
-	"github.com/taosdata/tdengine_gorm/clause/fill"
-	"github.com/taosdata/tdengine_gorm/clause/using"
-	"github.com/taosdata/tdengine_gorm/clause/window"
+	"github.com/BestNathan/tdenginegorm/clause/create"
+	"github.com/BestNathan/tdenginegorm/clause/fill"
+	"github.com/BestNathan/tdenginegorm/clause/using"
+	"github.com/BestNathan/tdenginegorm/clause/window"
 	"gorm.io/gorm"
 	"math/rand"
 	"testing"
