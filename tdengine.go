@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	_ "github.com/taosdata/driver-go/v3/taosRestful"
 	"gorm.io/gorm"
 	"gorm.io/gorm/callbacks"
 	"gorm.io/gorm/clause"
@@ -15,7 +14,12 @@ import (
 )
 
 // DriverName is the default driver name for TDengine.
-const DriverName = "taosRestful"
+const (
+	DriverName            = DriverNameTaosRestful
+	DriverNameTaosSql     = "taosSql"
+	DriverNameTaosRestful = "taosRestful"
+	DriverNameTaosWS      = "taosWS"
+)
 
 type Dialect struct {
 	DriverName string

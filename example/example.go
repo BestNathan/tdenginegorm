@@ -6,6 +6,11 @@ import (
 	"math/rand"
 	"time"
 
+	// choose driver you will use
+	_ "github.com/taosdata/driver-go/v3/taosSql"
+	_ "github.com/taosdata/driver-go/v3/taosWS"
+	_ "github.com/taosdata/driver-go/v3/taosRestful"
+
 	"github.com/BestNathan/tdenginegorm"
 	"github.com/BestNathan/tdenginegorm/clause/create"
 	"github.com/BestNathan/tdenginegorm/clause/fill"
@@ -23,6 +28,8 @@ type Data struct {
 func main() {
 	//create database
 	createDatabase()
+	createDatabaseRestful()
+	createDatabaseWS()
 	//connect to the database
 	db := connect()
 	//create a sTable
@@ -122,12 +129,42 @@ func main() {
 
 func createDatabase() {
 	dsnWithoutDB := "root:taosdata@/tcp(127.0.0.1:6030)/?loc=Local"
-	nativeDB, err := sql.Open(tdenginegorm.DriverName, dsnWithoutDB)
+	nativeDB, err := sql.Open(tdenginegorm.DriverNameTaosSql, dsnWithoutDB)
 	if err != nil {
 		log.Fatalf("connect db error:%v", err)
 		return
 	}
 	_, err = nativeDB.Exec("create database if not exists gorm_test")
+	if err != nil {
+		log.Fatalf("create database error %v", err)
+		return
+	}
+	_ = nativeDB.Close()
+}
+
+func createDatabaseRestful() {
+	dsnWithoutDB := "root:taosdata@/http(127.0.0.1:6041)/?loc=Local"
+	nativeDB, err := sql.Open(tdenginegorm.DriverNameTaosRestful, dsnWithoutDB)
+	if err != nil {
+		log.Fatalf("connect db error:%v", err)
+		return
+	}
+	_, err = nativeDB.Exec("create database if not exists gorm_restful_test")
+	if err != nil {
+		log.Fatalf("create database error %v", err)
+		return
+	}
+	_ = nativeDB.Close()
+}
+
+func createDatabaseWS() {
+	dsnWithoutDB := "root:taosdata@/ws(127.0.0.1:6041)/?loc=Local"
+	nativeDB, err := sql.Open(tdenginegorm.DriverNameTaosWS, dsnWithoutDB)
+	if err != nil {
+		log.Fatalf("connect db error:%v", err)
+		return
+	}
+	_, err = nativeDB.Exec("create database if not exists gorm_ws_test")
 	if err != nil {
 		log.Fatalf("create database error %v", err)
 		return

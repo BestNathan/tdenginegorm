@@ -1,16 +1,20 @@
-package tdenginegorm
+package tdenginegorm_test
 
 import (
 	"database/sql"
 	"fmt"
+	"math/rand"
+	"testing"
+	"time"
+
+	_ "github.com/taosdata/driver-go/v3/taosSql"
+
+	"github.com/BestNathan/tdenginegorm"
 	"github.com/BestNathan/tdenginegorm/clause/create"
 	"github.com/BestNathan/tdenginegorm/clause/fill"
 	"github.com/BestNathan/tdenginegorm/clause/using"
 	"github.com/BestNathan/tdenginegorm/clause/window"
 	"gorm.io/gorm"
-	"math/rand"
-	"testing"
-	"time"
 )
 
 func TestDialect(t *testing.T) {
@@ -18,14 +22,14 @@ func TestDialect(t *testing.T) {
 
 	rows := []struct {
 		description  string
-		dialect      *Dialect
+		dialect      *tdenginegorm.Dialect
 		openSuccess  bool
 		query        string
 		querySuccess bool
 	}{
 		{
 			description: "Default driver",
-			dialect: &Dialect{
+			dialect: &tdenginegorm.Dialect{
 				DSN: dsn,
 			},
 			openSuccess:  true,
@@ -34,8 +38,8 @@ func TestDialect(t *testing.T) {
 		},
 		{
 			description: "create db",
-			dialect: &Dialect{
-				DriverName: DriverName,
+			dialect: &tdenginegorm.Dialect{
+				DriverName: tdenginegorm.DriverNameTaosSql,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -44,8 +48,8 @@ func TestDialect(t *testing.T) {
 		},
 		{
 			description: "create table",
-			dialect: &Dialect{
-				DriverName: DriverName,
+			dialect: &tdenginegorm.Dialect{
+				DriverName: tdenginegorm.DriverNameTaosSql,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -54,8 +58,8 @@ func TestDialect(t *testing.T) {
 		},
 		{
 			description: "insert data",
-			dialect: &Dialect{
-				DriverName: DriverName,
+			dialect: &tdenginegorm.Dialect{
+				DriverName: tdenginegorm.DriverNameTaosSql,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -64,8 +68,8 @@ func TestDialect(t *testing.T) {
 		},
 		{
 			description: "query data",
-			dialect: &Dialect{
-				DriverName: DriverName,
+			dialect: &tdenginegorm.Dialect{
+				DriverName: tdenginegorm.DriverNameTaosSql,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -74,8 +78,8 @@ func TestDialect(t *testing.T) {
 		},
 		{
 			description: "syntax error",
-			dialect: &Dialect{
-				DriverName: DriverName,
+			dialect: &tdenginegorm.Dialect{
+				DriverName: tdenginegorm.DriverNameTaosSql,
 				DSN:        dsn,
 			},
 			openSuccess:  true,
@@ -120,7 +124,7 @@ func TestDialect(t *testing.T) {
 func TestClause(t *testing.T) {
 	//create db
 	dsnWithoutDB := "root:taosdata@/cfg/?loc=Local"
-	nativeDB, err := sql.Open(DriverName, dsnWithoutDB)
+	nativeDB, err := sql.Open(tdenginegorm.DriverNameTaosSql, dsnWithoutDB)
 	if err != nil {
 		t.Errorf("connect db error:%v", err)
 		return
@@ -132,7 +136,7 @@ func TestClause(t *testing.T) {
 	}
 	nativeDB.Close()
 	dsn := "root:taosdata@/cfg/gorm_test?loc=Local"
-	db, err := gorm.Open(Open(dsn))
+	db, err := gorm.Open(tdenginegorm.Open(dsn))
 	if err != nil {
 		t.Errorf("unexpected error:%v", err)
 		return
